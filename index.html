@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rev Store - Pusat Layanan Digital</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff0080;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --success: #00d68f;
+            --warning: #ffaa00;
+            --danger: #ff3d71;
+        }
+
+        body {
+            background-color: var(--darker);
+            color: var(--light);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: all 0.8s ease;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .login-container h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #ffeb3b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .login-container p {
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .input-group label {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .input-group input:focus + label,
+        .input-group input:valid + label {
+            top: 0;
+            font-size: 0.8rem;
+            background: var(--primary);
+            padding: 0 10px;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .btn {
+            background: linear-gradient(to right, var(--accent), #ff416c);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(255, 0, 128, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 0, 128, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--dark), var(--darker));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s;
+        }
+
+        .loading-container {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent);
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            color: var(--accent);
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            border-radius: 10px;
+            transition: width 2s ease;
+        }
+
+        /* Main Content */
+        #main-content {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(106, 17, 203, 0.9), rgba(37, 117, 252, 0.9));
+            padding: 20px;
+            border-radius: 0 0 30px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .welcome-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .welcome-section p {
+            opacity: 0.8;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(to right, var(--accent), #ff416c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Menu Grid */
+        .menu-section {
+            padding: 30px 20px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--accent);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .menu-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+        }
+
+        .menu-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .menu-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .menu-card p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .menu-card-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--dark);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            color: var(--accent);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .product-desc {
+            opacity: 0.8;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .product-tag {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+
+        .product-bonus {
+            color: var(--success);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        /* Payment Modal */
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .payment-option {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .payment-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent);
+        }
+
+        .payment-option.active {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .payment-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .payment-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .payment-desc {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .copyright {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .menu-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .login-container {
+                padding: 30px 20px;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-container">
+            <h1><i class="fas fa-store"></i> REV STORE</h1>
+            <p>Masukkan nama Anda untuk mengakses layanan digital premium</p>
+            <div class="input-group">
+                <input type="text" id="username-input" required>
+                <label for="username-input">Nama Anda</label>
+            </div>
+            <button class="btn" id="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Masuk ke Dashboard
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <h2>Menyiapkan Dashboard</h2>
+            <p class="loading-text">Memuat produk dan layanan...</p>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="welcome-section">
+                <h2>Selamat Datang, <span id="user-name">User</span>!</h2>
+                <p>Pusat Layanan Digital Premium</p>
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">R</div>
+                    <div>
+                        <div>Status: <span style="color: var(--success)">Aktif</span></div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Customer Premium</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Menu Section -->
+        <section class="menu-section">
+            <h2 class="section-title"><i class="fas fa-th-large"></i> Menu Layanan</h2>
+            <div class="menu-grid" id="menu-grid">
+                <!-- Menu items akan diisi oleh JavaScript -->
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fab fa-whatsapp" style="color: #25D366;"></i>
+                    <span>085828481568</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope" style="color: var(--accent);"></i>
+                    <span>revstore@service.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-clock" style="color: var(--warning);"></i>
+                    <span>Buka 24/7</span>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2023 Rev Store - Pusat Layanan Digital Premium. All rights reserved.
+            </div>
+        </footer>
+    </div>
+
+    <!-- Product Modals -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-box-open"></i> <span id="modal-title">Produk</span></h2>
+                <button class="close-modal" id="close-product-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="product-list">
+                    <!-- Daftar produk akan diisi oleh JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal" id="payment-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-credit-card"></i> Pilih Metode Pembayaran</h2>
+                <button class="close-modal" id="close-payment-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group" style="margin-bottom: 30px;">
+                    <input type="text" id="topup-username" required placeholder="Masukkan nama Anda untuk top up">
+                    <label for="topup-username">Nama untuk Top Up</label>
+                </div>
+                
+                <h3 style="margin-bottom: 20px;">Pilih Metode Pembayaran:</h3>
+                <div class="payment-options" id="payment-options">
+                    <!-- Opsi pembayaran akan diisi oleh JavaScript -->
+                </div>
+                
+                <div style="margin-top: 30px; text-align: center;">
+                    <button class="btn" id="confirm-payment-btn">
+                        <i class="fab fa-whatsapp"></i> Lanjutkan ke WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data produk
+        const products = {
+            listppgrub: [
+                { title: "5K = 10 MEM", price: "Rp 5.000", desc: "10 Member Grup" },
+                { title: "10K = 20 MEM", price: "Rp 10.000", desc: "20 Member Grup" },
+                { title: "15K = 25 MEM", price: "Rp 15.000", desc: "25 Member Grup" },
+                { title: "20K = 35 MEM", price: "Rp 20.000", desc: "35 Member Grup" },
+                { title: "25K = 40 MEM", price: "Rp 25.000", desc: "40 Member Grup" },
+                { title: "30K = 55 MEM", price: "Rp 30.000", desc: "55 Member Grup" },
+                { title: "40K = 70 MEM", price: "Rp 40.000", desc: "70 Member Grup" },
+                { title: "50K = 100 MEM", price: "Rp 50.000", desc: "100 Member Grup" },
+                { title: "150K FULL MEMBER", price: "Rp 150.000", desc: "Full Member Grup", tag: "POPULAR" }
+            ],
+            listppsaluran: [
+                { title: "5K 30P", price: "Rp 5.000", desc: "30 Peserta" },
+                { title: "10K 60P", price: "Rp 10.000", desc: "60 Peserta" },
+                { title: "15K 120P", price: "Rp 15.000", desc: "120 Peserta" },
+                { title: "20K 150P", price: "Rp 20.000", desc: "150 Peserta" },
+                { title: "25K 220P", price: "Rp 25.000", desc: "220 Peserta" },
+                { title: "30K 350P", price: "Rp 30.000", desc: "350 Peserta" },
+                { title: "40K 450P", price: "Rp 40.000", desc: "450 Peserta" },
+                { title: "50K 600P", price: "Rp 50.000", desc: "600 Peserta", tag: "BEST" }
+            ],
+            suntiksosmed: [
+                { title: "100 FOLLOWERS TIKTOK", price: "Rp 4.000", desc: "PERMANEN" },
+                { title: "1K FOLLOWERS TIKTOK", price: "Rp 30.000", desc: "PERMANEN", tag: "POPULAR" },
+                { title: "10K VIEW TIKTOK", price: "Rp 2.000", desc: "PERMANEN" },
+                { title: "100K VIEW TIKTOK", price: "Rp 12.000", desc: "PERMANEN" },
+                { title: "100 LIKE TIKTOK", price: "Rp 1.000", desc: "PERMANEN" },
+                { title: "100 FOLLOWERS IG", price: "Rp 5.000", desc: "PERMANEN" },
+                { title: "1K FOLLOWERS IG", price: "Rp 35.000", desc: "PERMANEN" },
+                { title: "100 LIKE IG", price: "Rp 1.500", desc: "PERMANEN" },
+                { title: "100 FOLLOWERS FB", price: "Rp 7.000", desc: "PERMANEN" },
+                { title: "100 LIKE FB", price: "Rp 3.000", desc: "PERMANEN" },
+                { title: "100 FOLLOWERS TWITTER", price: "Rp 5.000", desc: "MURAH" },
+                { title: "1K FOLLOWERS TWITTER", price: "Rp 37.000", desc: "MURAH" },
+                { title: "100 PENGIKUT WA", price: "Rp 5.000", desc: "PAKET REKOMENDASI", tag: "RECOMMENDED" }
+            ],
+            jpmokep: [
+                { title: "10K = 100 MEM", price: "Rp 10.000", desc: "100 Member" },
+                { title: "15K = 150+ MEM", price: "Rp 15.000", desc: "150+ Member" },
+                { title: "20K = 200++ MEM", price: "Rp 20.000", desc: "200++ Member" },
+                { title: "25K = 250++ MEM", price: "Rp 25.000", desc: "250++ Member" },
+                { title: "30K = 300++ MEM", price: "Rp 30.000", desc: "300++ Member" },
+                { title: "50K FULL MEMBER", price: "Rp 50.000", desc: "Full Member", tag: "BEST" }
+            ],
+            topupff: [
+                { title: "5 Diamonds", price: "Rp 1.040", desc: "Harga Normal: Rp 1.193", discount: "Rp 153" },
+                { title: "10 Diamonds", price: "Rp 1.880", desc: "Harga Normal: Rp 2.186", discount: "Rp 306", tag: "PROMO" },
+                { title: "20 Diamonds", price: "Rp 3.800", desc: "Harga Normal: Rp 4.172", discount: "Rp 372", tag: "PROMO" },
+                { title: "50 Diamonds", price: "Rp 7.400", desc: "Harga Normal: Rp 8.144", discount: "Rp 744", tag: "PROMO" },
+                { title: "70 Diamonds", price: "Rp 8.600", desc: "Harga Normal: Rp 10.130", discount: "Rp 1.530", tag: "PROMO" },
+                { title: "100 Diamonds", price: "Rp 17.000", desc: "GRATIS Bonus Item*", bonus: "Gratis Bonus Item", tag: "GRATIS BONUS" },
+                { title: "140 Diamonds", price: "Rp 18.000", desc: "Harga Normal: Rp 20.860", discount: "Rp 2.860", tag: "PROMO" },
+                { title: "500 Diamonds", price: "Rp 71.503", desc: "" },
+                { title: "1000 Diamonds", price: "Rp 141.020", desc: "" },
+                { title: "1440 Diamonds", price: "Rp 199.259", desc: "" },
+                { title: "7290 Diamonds", price: "Rp 997.999", desc: "", tag: "POPULAR" }
+            ],
+            topupml: [
+                { title: "3 Diamonds", price: "Rp 990", desc: "" },
+                { title: "5 Diamonds", price: "Rp 1.435", desc: "" },
+                { title: "10 Diamonds", price: "Rp 2.869", desc: "9 + 1 Bonus" },
+                { title: "12 Diamonds", price: "Rp 3.547", desc: "11 + 1 Bonus" },
+                { title: "14 Diamonds", price: "Rp 4.058", desc: "13 + 1 Bonus" },
+                { title: "18 Diamonds", price: "Rp 5.023", desc: "17 + 1 Bonus" },
+                { title: "28 Diamonds", price: "Rp 7.853", desc: "25 + 3 Bonus" },
+                { title: "36 Diamonds", price: "Rp 9.846", desc: "33 + 3 Bonus" },
+                { title: "54 Diamonds", price: "Rp 14.670", desc: "50 + 4 Bonus" },
+                { title: "59 Diamonds", price: "Rp 15.446", desc: "53 + 6 Bonus" },
+                { title: "71 Diamonds", price: "Rp 18.854", desc: "64 + 7 Bonus" },
+                { title: "85 Diamonds", price: "Rp 22.204", desc: "77 + 8 Bonus" },
+                { title: "110 Diamonds", price: "Rp 29.138", desc: "100 + 10 Bonus", tag: "BEST VALUE" },
+                { title: "148 Diamonds", price: "Rp 38.934", desc: "134 + 14 Bonus" },
+                { title: "170 Diamonds", price: "Rp 44.357", desc: "154 + 16 Bonus" },
+                { title: "222 Diamonds", price: "Rp 58.226", desc: "200 + 22 Bonus" },
+                { title: "277 Diamonds", price: "Rp 73.344", desc: "250 + 27 Bonus" },
+                { title: "333 Diamonds", price: "Rp 88.778", desc: "302 + 31 Bonus" },
+                { title: "370 Diamonds", price: "Rp 97.459", desc: "333 + 37 Bonus", tag: "POPULAR" },
+                { title: "384 Diamonds", price: "Rp 101.318", desc: "346 + 38 Bonus" }
+            ]
+        };
+
+        // Data menu
+        const menuItems = [
+            { id: "listppgrub", title: "List PP Grup", icon: "fas fa-users", desc: "Tambah member grup WhatsApp dengan cepat", color: "#6a11cb" },
+            { id: "listppsaluran", title: "List PP Saluran", icon: "fas fa-broadcast-tower", desc: "Tambah peserta saluran WhatsApp", color: "#2575fc" },
+            { id: "suntiksosmed", title: "Suntik Sosmed", icon: "fas fa-syringe", desc: "Tambah followers, like, view media sosial", color: "#ff0080" },
+            { id: "jpmokep", title: "JPM Okep", icon: "fas fa-crown", desc: "Jasa premium member eksklusif", color: "#ffaa00" },
+            { id: "topupff", title: "Top Up Free Fire", icon: "fas fa-fire", desc: "Isi diamonds Free Fire murah", color: "#ff416c" },
+            { id: "topupml", title: "Top Up Mobile Legends", icon: "fas fa-gamepad", desc: "Isi diamonds Mobile Legends", color: "#00d68f" },
+            { id: "webklasik", title: "Web Klasik", icon: "fas fa-code", desc: "Layanan pembuatan web klasik", color: "#8a2be2", admin: true },
+            { id: "webkeren", title: "Web Keren", icon: "fas fa-desktop", desc: "Layanan pembuatan web modern", color: "#36d1dc", admin: true },
+            { id: "webotomatis", title: "Web Pembelian Otomatis", icon: "fas fa-robot", desc: "Sistem pembelian otomatis", color: "#5d00ff", admin: true }
+        ];
+
+        // Data pembayaran
+        const paymentMethods = [
+            { id: "dana", name: "DANA", desc: "085828481568", icon: "fas fa-wallet", color: "#00d68f" },
+            { id: "revv", name: "Revv", desc: "Transfer REVV", icon: "fas fa-money-bill-wave", color: "#2575fc" },
+            { id: "qris", name: "QRIS", desc: "Minta Admin", icon: "fas fa-qrcode", color: "#ff0080" },
+            { id: "okedigital", name: "OKE DIGITAL", desc: "Pembayaran digital", icon: "fas fa-mobile-alt", color: "#ffaa00" },
+            { id: "gopay", name: "GoPay", desc: "081220568534", icon: "fab fa-google-wallet", color: "#8a2be2" },
+            { id: "anonym", name: "A**** K******", desc: "Transfer bank", icon: "fas fa-user-secret", color: "#36d1dc" }
+        ];
+
+        // State aplikasi
+        let currentUser = "";
+        let selectedProduct = null;
+        let selectedPayment = null;
+
+        // DOM Elements
+        const loginScreen = document.getElementById("login-screen");
+        const loadingScreen = document.getElementById("loading-screen");
+        const mainContent = document.getElementById("main-content");
+        const loginBtn = document.getElementById("login-btn");
+        const usernameInput = document.getElementById("username-input");
+        const userNameSpan = document.getElementById("user-name");
+        const userAvatar = document.getElementById("user-avatar");
+        const menuGrid = document.getElementById("menu-grid");
+        const productModal = document.getElementById("product-modal");
+        const paymentModal = document.getElementById("payment-modal");
+        const closeProductModal = document.getElementById("close-product-modal");
+        const closePaymentModal = document.getElementById("close-payment-modal");
+        const productList = document.getElementById("product-list");
+        const modalTitle = document.getElementById("modal-title");
+        const paymentOptions = document.getElementById("payment-options");
+        const confirmPaymentBtn = document.getElementById("confirm-payment-btn");
+        const topupUsername = document.getElementById("topup-username");
+
+        // Event Listeners
+        loginBtn.addEventListener("click", handleLogin);
+        closeProductModal.addEventListener("click", () => toggleModal(productModal, false));
+        closePaymentModal.addEventListener("click", () => toggleModal(paymentModal, false));
+        confirmPaymentBtn.addEventListener("click", handleConfirmPayment);
+
+        // Fungsi untuk menangani login
+        function handleLogin() {
+            const username = usernameInput.value.trim();
+            
+            if (!username) {
+                alert("Harap masukkan nama Anda!");
+                usernameInput.focus();
+                return;
+            }
+            
+            currentUser = username;
+            userNameSpan.textContent = username;
+            userAvatar.textContent = username.charAt(0).toUpperCase();
+            
+            // Sembunyikan login screen
+            loginScreen.style.opacity = "0";
+            setTimeout(() => {
+                loginScreen.style.display = "none";
+                
+                // Tampilkan loading screen
+                loadingScreen.style.opacity = "1";
+                loadingScreen.style.visibility = "visible";
+                
+                // Animasikan progress bar
+                const progressBar = document.querySelector(".loading-progress");
+                progressBar.style.width = "100%";
+                
+                // Setelah loading selesai, tampilkan konten utama
+                setTimeout(() => {
+                    loadingScreen.style.opacity = "0";
+                    loadingScreen.style.visibility = "hidden";
+                    
+                    mainContent.style.opacity = "1";
+                    mainContent.style.visibility = "visible";
+                    
+                    // Render menu
+                    renderMenu();
+                }, 2000);
+            }, 800);
+        }
+
+        // Fungsi untuk merender menu
+        function renderMenu() {
+            menuGrid.innerHTML = "";
+            
+            menuItems.forEach(item => {
+                const menuCard = document.createElement("div");
+                menuCard.className = "menu-card";
+                menuCard.style.borderTop = `5px solid ${item.color}`;
+                
+                menuCard.innerHTML = `
+                    ${item.admin ? '<div class="menu-card-tag">Minta Admin</div>' : ''}
+                    <div class="menu-card-icon">
+                        <i class="${item.icon}"></i>
+                    </div>
+                    <h3>${item.title}</h3>
+                    <p>${item.desc}</p>
+                    <button class="btn btn-secondary" style="padding: 10px 20px; font-size: 0.9rem;">
+                        ${item.admin ? 'Hubungi Admin' : 'Lihat Produk'} <i class="fas fa-arrow-right"></i>
+                    </button>
+                `;
+                
+                // Event listener untuk menu card
+                menuCard.addEventListener("click", () => {
+                    if (item.admin) {
+                        // Untuk menu yang perlu hubungi admin
+                        openWhatsApp(`Halo min Rev, saya ${currentUser} ingin bertanya tentang ${item.title}`);
+                    } else {
+                        // Untuk menu produk biasa
+                        openProductModal(item.id, item.title);
+                    }
+                });
+                
+                menuGrid.appendChild(menuCard);
+            });
+        }
+
+        // Fungsi untuk membuka modal produk
+        function openProductModal(productId, productTitle) {
+            selectedProduct = {
+                id: productId,
+                title: productTitle,
+                item: null
+            };
+            
+            modalTitle.textContent = productTitle;
+            productList.innerHTML = "";
+            
+            // Buat grid produk
+            const grid = document.createElement("div");
+            grid.className = "product-grid";
+            
+            products[productId].forEach(product => {
+                const productCard = document.createElement("div");
+                productCard.className = "product-card";
+                
+                productCard.innerHTML = `
+                    ${product.tag ? `<div class="product-tag">${product.tag}</div>` : ''}
+                    <div class="product-title">${product.title}</div>
+                    <div class="product-price">${product.price}</div>
+                    <div class="product-desc">${product.desc}</div>
+                    ${product.discount ? `<div style="color: var(--success); font-size: 0.9rem;">Diskon: ${product.discount}</div>` : ''}
+                    ${product.bonus ? `<div class="product-bonus">${product.bonus}</div>` : ''}
+                    <button class="btn" style="padding: 8px 15px; font-size: 0.8rem; width: 100%; margin-top: 10px;">
+                        Pilih <i class="fas fa-shopping-cart"></i>
+                    </button>
+                `;
+                
+                // Event listener untuk memilih produk
+                productCard.addEventListener("click", (e) => {
+                    if (e.target.tagName === "BUTTON" || e.target.closest("button")) {
+                        selectedProduct.item = product;
+                        toggleModal(productModal, false);
+                        openPaymentModal();
+                    }
+                });
+                
+                grid.appendChild(productCard);
+            });
+            
+            productList.appendChild(grid);
+            toggleModal(productModal, true);
+        }
+
+        // Fungsi untuk membuka modal pembayaran
+        function openPaymentModal() {
+            // Reset pilihan pembayaran
+            selectedPayment = null;
+            topupUsername.value = currentUser;
+            
+            // Render opsi pembayaran
+            paymentOptions.innerHTML = "";
+            
+            paymentMethods.forEach(payment => {
+                const paymentOption = document.createElement("div");
+                paymentOption.className = "payment-option";
+                paymentOption.dataset.id = payment.id;
+                
+                paymentOption.innerHTML = `
+                    <div class="payment-icon">
+                        <i class="${payment.icon}"></i>
+                    </div>
+                    <div class="payment-name">${payment.name}</div>
+                    <div class="payment-desc">${payment.desc}</div>
+                `;
+                
+                paymentOption.addEventListener("click", () => {
+                    // Hapus kelas active dari semua opsi
+                    document.querySelectorAll(".payment-option").forEach(opt => {
+                        opt.classList.remove("active");
+                    });
+                    
+                    // Tambahkan kelas active ke opsi yang dipilih
+                    paymentOption.classList.add("active");
+                    selectedPayment = payment;
+                });
+                
+                paymentOptions.appendChild(paymentOption);
+            });
+            
+            toggleModal(paymentModal, true);
+        }
+
+        // Fungsi untuk menangani konfirmasi pembayaran
+        function handleConfirmPayment() {
+            const topupName = topupUsername.value.trim();
+            
+            if (!topupName) {
+                alert("Harap masukkan nama Anda untuk top up!");
+                topupUsername.focus();
+                return;
+            }
+            
+            if (!selectedPayment) {
+                alert("Harap pilih metode pembayaran!");
+                return;
+            }
+            
+            // Format pesan WhatsApp
+            const product = selectedProduct.item;
+            const productName = selectedProduct.title;
+            
+            const message = `HALO MIN REV%0A%0ASaya ${topupName} ingin membeli%0A%0APRODUK: ${productName} - ${product.title}%0AHARGA: ${product.price}%0APAYMENT: ${selectedPayment.name} (${selectedPayment.desc})`;
+            
+            // Buka WhatsApp
+            openWhatsApp(message);
+            
+            // Tutup modal
+            toggleModal(paymentModal, false);
+        }
+
+        // Fungsi untuk membuka WhatsApp
+        function openWhatsApp(message) {
+            const phone = "6285828481568";
+            const url = `https://wa.me/${phone}?text=${message}`;
+            window.open(url, "_blank");
+        }
+
+        // Fungsi untuk toggle modal
+        function toggleModal(modal, show) {
+            if (show) {
+                modal.classList.add("active");
+                document.body.style.overflow = "hidden";
+            } else {
+                modal.classList.remove("active");
+                document.body.style.overflow = "auto";
+            }
+        }
+
+        // Event listener untuk menutup modal saat klik di luar konten
+        window.addEventListener("click", (e) => {
+            if (e.target === productModal) {
+                toggleModal(productModal, false);
+            }
+            if (e.target === paymentModal) {
+                toggleModal(paymentModal, false);
+            }
+        });
+
+        // Animasi tambahan untuk efek keren
+        document.addEventListener("DOMContentLoaded", () => {
+            // Efek parallax sederhana
+            window.addEventListener("scroll", () => {
+                const scrolled = window.pageYOffset;
+                const parallaxElements = document.querySelectorAll(".menu-card");
+                
+                parallaxElements.forEach((el, index) => {
+                    const speed = 0.05;
+                    const yPos = -(scrolled * speed) + (index * 10);
+                    el.style.transform = `translateY(${yPos}px)`;
+                });
+            });
+            
+            // Efek hover untuk menu card
+            const menuCards = document.querySelectorAll(".menu-card");
+            menuCards.forEach(card => {
+                card.addEventListener("mouseenter", () => {
+                    card.style.transform = "translateY(-10px) scale(1.02)";
+                });
+                
+                card.addEventListener("mouseleave", () => {
+                    card.style.transform = "translateY(0) scale(1)";
+                });
+            });
+        });
+    </script>
+</body>
+</html>
