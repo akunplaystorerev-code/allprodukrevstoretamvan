@@ -509,6 +509,13 @@
         .payment-desc {
             opacity: 0.8;
             font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .payment-note {
+            font-size: 0.8rem;
+            color: var(--warning);
+            margin-top: 5px;
         }
 
         /* Footer */
@@ -556,6 +563,21 @@
             .section-title {
                 font-size: 1.5rem;
             }
+            
+            .payment-options {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+        
+        /* Animasi untuk QRIS */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
         }
     </style>
 </head>
@@ -773,14 +795,33 @@
             { id: "webotomatis", title: "Web Pembelian Otomatis", icon: "fas fa-robot", desc: "Sistem pembelian otomatis", color: "#5d00ff", admin: true }
         ];
 
-        // Data pembayaran
+        // Data pembayaran yang sudah diperbarui
         const paymentMethods = [
-            { id: "dana", name: "DANA", desc: "085828481568", icon: "fas fa-wallet", color: "#00d68f" },
-            { id: "revv", name: "Revv", desc: "Transfer REVV", icon: "fas fa-money-bill-wave", color: "#2575fc" },
-            { id: "qris", name: "QRIS", desc: "Minta Admin", icon: "fas fa-qrcode", color: "#ff0080" },
-            { id: "okedigital", name: "OKE DIGITAL", desc: "Pembayaran digital", icon: "fas fa-mobile-alt", color: "#ffaa00" },
-            { id: "gopay", name: "GoPay", desc: "081220568534", icon: "fab fa-google-wallet", color: "#8a2be2" },
-            { id: "anonym", name: "A**** K******", desc: "Transfer bank", icon: "fas fa-user-secret", color: "#36d1dc" }
+            { 
+                id: "dana", 
+                name: "DANA", 
+                desc: "085828481568", 
+                atasNama: "REVV",
+                icon: "fas fa-wallet", 
+                color: "#00d68f" 
+            },
+            { 
+                id: "gopay", 
+                name: "GoPay", 
+                desc: "081220568534", 
+                atasNama: "A**** K******",
+                icon: "fab fa-google-wallet", 
+                color: "#8a2be2" 
+            },
+            { 
+                id: "qris", 
+                name: "QRIS", 
+                desc: "Minta REVV", 
+                note: "QRIS No Pajak",
+                icon: "fas fa-qrcode", 
+                color: "#ff0080",
+                special: true
+            }
         ];
 
         // State aplikasi
@@ -951,12 +992,19 @@
                 paymentOption.className = "payment-option";
                 paymentOption.dataset.id = payment.id;
                 
+                // Tambahkan kelas khusus untuk QRIS
+                if (payment.special) {
+                    paymentOption.classList.add("pulse-animation");
+                }
+                
                 paymentOption.innerHTML = `
                     <div class="payment-icon">
                         <i class="${payment.icon}"></i>
                     </div>
                     <div class="payment-name">${payment.name}</div>
                     <div class="payment-desc">${payment.desc}</div>
+                    <div class="payment-desc" style="font-size: 0.85rem; color: #ffeb3b;">Atas Nama: ${payment.atasNama}</div>
+                    ${payment.note ? `<div class="payment-note"><i class="fas fa-info-circle"></i> ${payment.note}</div>` : ''}
                 `;
                 
                 paymentOption.addEventListener("click", () => {
@@ -995,7 +1043,19 @@
             const product = selectedProduct.item;
             const productName = selectedProduct.title;
             
-            const message = `HALO MIN REV%0A%0ASaya ${topupName} ingin membeli%0A%0APRODUK: ${productName} - ${product.title}%0AHARGA: ${product.price}%0APAYMENT: ${selectedPayment.name} (${selectedPayment.desc})`;
+            let message = `HALO MIN REV%0A%0ASaya ${topupName} ingin membeli%0A%0A`;
+            message += `PRODUK: ${productName} - ${product.title}%0A`;
+            message += `HARGA: ${product.price}%0A`;
+            message += `PAYMENT: ${selectedPayment.name}%0A`;
+            
+            // Tambahkan detail pembayaran berdasarkan metode
+            if (selectedPayment.id === "qris") {
+                message += `Detail: ${selectedPayment.desc} (${selectedPayment.note})%0A`;
+                message += `Note: QRIS NO PAJAK, minta QRIS ke admin setelah konfirmasi`;
+            } else {
+                message += `Nomor: ${selectedPayment.desc}%0A`;
+                message += `Atas Nama: ${selectedPayment.atasNama}`;
+            }
             
             // Buka WhatsApp
             openWhatsApp(message);
@@ -1057,6 +1117,16 @@
                     card.style.transform = "translateY(0) scale(1)";
                 });
             });
+            
+            // Auto focus pada input username saat halaman dimuat
+            usernameInput.focus();
+        });
+        
+        // Tambahkan event listener untuk enter pada input username
+        usernameInput.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                handleLogin();
+            }
         });
     </script>
 </body>
